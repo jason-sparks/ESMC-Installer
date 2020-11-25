@@ -79,14 +79,20 @@ function install_mysql()
 
     if test -s /etc/apt/sources.list.d/mysql.list; then
         apt update
-        debconf-set-selections <<< "mysql-community-server mysql-community-server/root-pass password eset.nod32"
-        debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password eset.nod32"
+        debconf-set-selections <<< "mysql-community-server mysql-community-server/root-pass password eraadmin"
+        debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password eraadmin"
         DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server unixodbc
     fi 
 
     STR=`mysql --version`
     SUB="mysql  Ver 8"
     if [[ "$STR" == *"$SUB"* ]]; then
+
+    echo "[mysqld]" >> /etc/mysql/my.cnf
+    echo "log_bin_trust_function_creators=1" >> /etc/mysql/my.cnf
+    echo "innodb_log_file_size=100M" >> /etc/mysql/my.cnf
+    echo "innodb_log_files_in_group=2" >> /etc/mysql/my.cnf
+
     systemctl start mysql &
     echo ""
     echo "Finished Installing MySQL Server 8"
@@ -112,18 +118,46 @@ function uninstall_mysql()
 
 function install_mysql_odbc()
 {
-    if `test ! -f /etc/odbcinst.ini`; then
+    if `test -f /etc/odbcinst.ini`; then
       echo ""
       echo "Installing MySQL ODBC Driver..."
       echo ""
-      if `test ! -s $(basename $odbc_url)`; then
+      if `test -s $(basename $odbc_url)`; then
         tar xzvf $(basename $odbc_url)
-        cd $(basename $odbc_url)
-        cp ./bin/* /usr/local/bin
-        cp ./lib/* /usr/local/lib
+        cd $(basename ${odbc_url%.*.*}) 
+        cp ./bin/* /usr/local/bin/
+        cp ./lib/* /usr/local/lib/
         myodbc-installer -a -d -n "MySQL ODBC 8.0 Driver" -t "Driver=/usr/local/lib/libmyodbc8w.so"
       fi
+      echo ""
+      echo "Done"
+      echo ""
     fi
+}
+
+function uninstall_mysql_odbc()
+{
+    if `test -s /etc/odbcinst.ini`; then
+      echo ""
+      echo "Uninstalling MySQL ODBC Driver..."
+      echo ""
+    fi
+    myodbc-installer -r -d -n "MySQL ODBC 8.0 Driver"
+    if `test -s /usr/local/lib/libmyodbc8S.so`; then
+      rm -f /usr/local/lib/libmyodbc8S.so
+    fi
+    if `test -s /usr/local/lib/libmyodbc8w.so`; then
+      rm -f /usr/local/lib/libmyodbc8w.so
+    fi
+    if `test -s /usr/local/lib/libmyodbc8a.so`; then
+      rm -f /usr/local/lib/libmyodbc8a.so
+    fi
+    if `test -s /usr/local/bin/myodbc-installer`; then
+      rm -f /usr/local/bin/myodbc-installer
+    fi
+      echo ""
+      echo "Done"
+      echo ""
 }
 
 function install_java()
