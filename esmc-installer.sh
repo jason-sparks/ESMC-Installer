@@ -14,10 +14,14 @@ ESMC_server_url="https://download.eset.com/com/eset/apps/business/era/server/lin
 ESMC_web_console_url="https://download.eset.com/com/eset/apps/business/era/webconsole/latest/era.war"
 ESMC_rdsensor_url="https://download.eset.com/com/eset/apps/business/era/rdsensor/latest/rdsensor-linux-x86_64.sh"
 
-tomcat_installer=
-ESMC_server_installer=
-ESMC_web_console_installer=
-ESMC_rdsensor_installer=
+if [[ "$VERSION_ID" == "16.04" ]]; then 
+  odbc_url=https://downloads.mysql.com/archives/get/p/10/file/mysql-connector-odbc-8.0.17-linux-ubuntu16.04-x86-64bit.tar.gz
+elif [[ "$VERSION_ID" == "18.04" ]]; then 
+  odbc_url=https://downloads.mysql.com/archives/get/p/10/file/mysql-connector-odbc-8.0.17-linux-ubuntu18.04-x86-64bit.tar.gz
+elif [[ "$VERSION_ID" == "20.04" ]]; then 
+  odbc_url=https://downloads.mysql.com/archives/get/p/10/file/mysql-connector-odbc-8.0.17-linux-ubuntu18.04-x86-64bit.tar.gz
+fi
+
 
 #############
 # FUNCTIONS #
@@ -40,23 +44,23 @@ function download_packages()
     echo "Downloading components..."
     echo ""
 
-    if `test ! -s $(basename $ESMC_server_url)`;
-    then
+    if `test ! -s $(basename $ESMC_server_url)`; then
         wget --connect-timeout 300 --no-check-certificate "$ESMC_server_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_server_url" &
     fi
 
-    if `test ! -s $(basename $ESMC_web_console_url)`;
-    then
+    if `test ! -s $(basename $ESMC_web_console_url)`; then
         wget --connect-timeout 300 --no-check-certificate "$ESMC_web_console_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_web_console_url" &
     fi
 
-    if `test ! -s $(basename $ESMC_rdsensor_url)`;
-    then
+    if `test ! -s $(basename $ESMC_rdsensor_url)`; then
         wget --connect-timeout 300 --no-check-certificate "$ESMC_rdsensor_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_rdsensor_url" &
     fi
 
-    if `test ! -s $(basename $tomcat_url)`;
-    then
+    if `test ! -s $(basename $tomcat_url)`; then
+        wget --connect-timeout 300 --no-check-certificate "$tomcat_url" || curl -O --fail --connect-timeout 300 -k "$tomcat_url" &
+    fi
+
+    if `test ! -s $(basename $tomcat_url)`; then
         wget --connect-timeout 300 --no-check-certificate "$tomcat_url" || curl -O --fail --connect-timeout 300 -k "$tomcat_url" &
     fi
 
@@ -73,12 +77,11 @@ function install_mysql()
     # This repo is distribution specific and needs logic added for switching xenial, bionic, focal cases
     echo "deb http://repo.mysql.com/apt/ubuntu/ "$UBUNTU_CODENAME" mysql-8.0" > /etc/apt/sources.list.d/mysql.list
 
-    if test -s /etc/apt/sources.list.d/mysql.list; 
-    then
+    if test -s /etc/apt/sources.list.d/mysql.list; then
         apt update
         debconf-set-selections <<< "mysql-community-server mysql-community-server/root-pass password eset.nod32"
         debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password eset.nod32"
-        DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server
+        DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server unixodbc
     fi 
 
     STR=`mysql --version`
@@ -107,6 +110,22 @@ function uninstall_mysql()
     fi
 }
 
+function install_mysql_odbc()
+{
+    if `test ! -f /etc/odbcinst.ini`; then
+      echo ""
+      echo "Installing MySQL ODBC Driver..."
+      echo ""
+      if `test ! -s $(basename $odbc_url)`; then
+        tar xzvf $(basename $odbc_url)
+        cd $(basename $odbc_url)
+        cp ./bin/* /usr/local/bin
+        cp ./lib/* /usr/local/lib
+        myodbc-installer -a -d -n "MySQL ODBC 8.0 Driver" -t "Driver=/usr/local/lib/libmyodbc8w.so"
+      fi
+    fi
+}
+
 function install_java()
 {
     java -version
@@ -122,8 +141,7 @@ function install_java()
 
 function create_systemd_service_file() 
 {
-    if test -s /etc/systemd/system/multi-user.target.wants/tomcat.service; 
-    then
+    if test -s /etc/systemd/system/multi-user.target.wants/tomcat.service; then
         echo "Tomcat service file already exists. Is tomcat already installed?"
         return 10
     else
@@ -268,6 +286,26 @@ done
 
 
 
+
+function install_esmc_server()
+{
+  echo ""
+  echo "Installing ESMC Server..."
+  echo ""
+  chmod +x ./server-linux-x86_64.sh
+  ./server-linux-x86_64.sh \
+  --skip-license \
+  --db-type="MySQL Server" \
+  --db-driver="MySQL ODBC 8.0 Driver" \
+  --db-hostname=localhost \
+  --db-port=3306 \
+  --db-admin-username=root \
+  --db-admin-password=eraadmin \
+  --server-root-password=eraadmin \
+  --db-user-username=root \
+  --db-user-password=eraadmin \
+  --cert-hostname="*"
+}
 
 
 
