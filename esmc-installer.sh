@@ -275,8 +275,11 @@ function print_usage()
     -d, --download-packages......................[optional] download ESMC components 
     -m, --install-mysql..........................[optional] install MySQL
     -M, --uninstall-mysql........................[optional] uninstall MySQL
+    -o, --install-mysql..........................[optional] install MySQL ODBC connector
+    -O, --uninstall-mysql........................[optional] uninstall MySQL ODBC connector
     -t, --install-tomcat.........................[optional] install tomcat
     -T, --uninstall-tomcat.......................[optional] uninstall tomcat
+    -s, --install-esmc-server....................[optional] install ESMC server
 
     --hostname=                                  server hostname for connecting to the server (hostname, IPv4, IPv6 or service record)
     --port=                                      server port for connecting (not needed if service record was provided), default is '2222'
@@ -317,6 +320,16 @@ do
     -M|--uninstall-mysql)
       verify_root
       uninstall_mysql
+      exit 0
+      ;;
+    -o|--install-odbc)
+      verify_root
+      install_mysql_odbc
+      exit 0
+      ;;
+    -O|--uninstall-odbc)
+      verify_root
+      uninstall_mysql_odbc
       exit 0
       ;;
     -t|--install-tomcat)
