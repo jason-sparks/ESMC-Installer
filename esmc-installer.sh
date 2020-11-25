@@ -74,7 +74,7 @@ function install_mysql()
     echo ""
     echo "Installing MySQL Server 8..."
     echo ""
-    # This repo is distribution specific and needs logic added for switching xenial, bionic, focal cases
+    # This repo is distribution specific xenial, bionic, focal, etc.
     echo "deb http://repo.mysql.com/apt/ubuntu/ "$UBUNTU_CODENAME" mysql-8.0" > /etc/apt/sources.list.d/mysql.list
 
     if test -s /etc/apt/sources.list.d/mysql.list; then
@@ -94,17 +94,27 @@ function install_mysql()
     echo "innodb_log_files_in_group=2" >> /etc/mysql/my.cnf
 
     systemctl start mysql &
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'eraadmin';"
     echo ""
     echo "Finished Installing MySQL Server 8"
     echo ""
     fi
+
 }
 
 function uninstall_mysql() 
 {
-    apt-get remove -y mysql-server
+    systemctl stop mysql
+    apt-get purge -y mysql-server
     apt-get -y autoremove
     rm -f /etc/apt/sources.list.d/mysql.list
+    rm -Rf /var/lib/mysql
+    rm -Rf /var/log/mysql
+    rm -Rf /etc/mysql
+    rm /etc/systemd/system/multi-user.target.wants/mysql.service
+    rm /etc/systemd/system/mysql.service
+    apt autoremove
+    apt autoclean
     # Any mysql packages installed? 
     # dpkg -l | grep mysql | grep ii | wc -l
     mysql --version 
@@ -249,6 +259,11 @@ function install_esmc_server()
   echo ""
   echo "Installing ESMC Server..."
   echo ""
+
+  # STR=`systemctl status mysql | grep Active:`
+  # SUB="running"
+  # if [[ "$STR" == *"$SUB"* ]]; then
+
   chmod +x ./server-linux-x86_64.sh
   ./server-linux-x86_64.sh \
   --skip-license \
@@ -264,6 +279,15 @@ function install_esmc_server()
   --cert-hostname="*"
 }
 
+function uninstall_esmc_server()
+{
+  echo ""
+  echo "Uninstalling ESMC Server..."
+  echo ""
+  ./server-linux-x86_64.sh \
+  --uninstall
+}
+
 function print_usage()
 {
     cat <<EOF
@@ -275,8 +299,8 @@ function print_usage()
     -d, --download-packages......................[optional] download ESMC components 
     -m, --install-mysql..........................[optional] install MySQL
     -M, --uninstall-mysql........................[optional] uninstall MySQL
-    -o, --install-mysql..........................[optional] install MySQL ODBC connector
-    -O, --uninstall-mysql........................[optional] uninstall MySQL ODBC connector
+    -o, --install-odbc..........................[optional] install MySQL ODBC connector
+    -O, --uninstall-odbc........................[optional] uninstall MySQL ODBC connector
     -t, --install-tomcat.........................[optional] install tomcat
     -T, --uninstall-tomcat.......................[optional] uninstall tomcat
     -s, --install-esmc-server....................[optional] install ESMC server
@@ -355,12 +379,12 @@ do
   shift
 done
 
-
-
-
-
-
-
-
-
+if test $# -eq 0; then
+  verify_root
+  download_packages  
+  install_mysql
+  install_mysql_odbc
+  install_java
+  install_tomcat
+  install_esmc_server
 
