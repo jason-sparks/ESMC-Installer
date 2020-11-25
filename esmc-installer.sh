@@ -244,6 +244,26 @@ function uninstall_tomcat()
     echo ""
 }
 
+function install_esmc_server()
+{
+  echo ""
+  echo "Installing ESMC Server..."
+  echo ""
+  chmod +x ./server-linux-x86_64.sh
+  ./server-linux-x86_64.sh \
+  --skip-license \
+  --db-type="MySQL Server" \
+  --db-driver="MySQL ODBC 8.0 Driver" \
+  --db-hostname=localhost \
+  --db-port=3306 \
+  --db-admin-username=root \
+  --db-admin-password=eraadmin \
+  --server-root-password=eraadmin \
+  --db-user-username=root \
+  --db-user-password=eraadmin \
+  --cert-hostname="*"
+}
+
 function print_usage()
 {
     cat <<EOF
@@ -309,6 +329,11 @@ do
       uninstall_tomcat
       exit 0
       ;;
+    -s|--install-esmc-server)
+      verify_root
+      install_esmc_server
+      exit 0
+      ;;
     *)
       echo "Unknown option \"$1\". Run '$script_name --help' for usage information." >&2
       exit 1
@@ -321,25 +346,7 @@ done
 
 
 
-function install_esmc_server()
-{
-  echo ""
-  echo "Installing ESMC Server..."
-  echo ""
-  chmod +x ./server-linux-x86_64.sh
-  ./server-linux-x86_64.sh \
-  --skip-license \
-  --db-type="MySQL Server" \
-  --db-driver="MySQL ODBC 8.0 Driver" \
-  --db-hostname=localhost \
-  --db-port=3306 \
-  --db-admin-username=root \
-  --db-admin-password=eraadmin \
-  --server-root-password=eraadmin \
-  --db-user-username=root \
-  --db-user-password=eraadmin \
-  --cert-hostname="*"
-}
+
 
 
 
