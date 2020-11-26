@@ -387,4 +387,4 @@ if test $# -eq 0; then
   install_java
   install_tomcat
   install_esmc_server
-
+fi
