@@ -74,6 +74,14 @@ function install_mysql()
     echo ""
     echo "Installing MySQL Server 8..."
     echo ""
+    mysql --version 
+
+    if [[ "$?" = 0 ]]; then
+    echo ""
+    echo "MySQL Server is Installed"
+    echo ""
+    fi
+
     # This repo is distribution specific xenial, bionic, focal, etc.
     echo "deb http://repo.mysql.com/apt/ubuntu/ "$UBUNTU_CODENAME" mysql-8.0" > /etc/apt/sources.list.d/mysql.list
 
@@ -94,6 +102,21 @@ function install_mysql()
     echo "innodb_log_files_in_group=2" >> /etc/mysql/my.cnf
 
     systemctl start mysql &
+
+
+    # STR=`systemctl status mysql | grep Active:`
+    # SUB="start"
+    # if [[ "$STR" == *"$SUB"* ]]; then
+
+    # fi
+
+
+    # STR=`systemctl status mysql | grep Active:`
+    # SUB="running"
+    # if [[ "$STR" == *"$SUB"* ]]; then
+
+    # fi
+
     mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'eraadmin';"
     echo ""
     echo "Finished Installing MySQL Server 8"
@@ -172,10 +195,10 @@ function uninstall_mysql_odbc()
 
 function install_java()
 {
-    java -version
+    java -version 
     if [[ "$?" != 0 ]]; then 
         echo ""
-        echo "Installing Java"
+        echo "Installing Java..."
         echo ""
         apt -y install default-jdk
     else
@@ -215,7 +238,7 @@ function create_systemd_service_file()
         echo 'Restart=always' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
         echo '' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
         echo '[Install]' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'WantedBy=multi-user.target' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
+        echo 'WantedBy=multi-user.target' >> /etc/systemd/system/mqulti-user.target.wants/tomcat.service
 
         return 0;
     fi
@@ -265,7 +288,7 @@ function install_esmc_server()
   # if [[ "$STR" == *"$SUB"* ]]; then
 
   chmod +x ./server-linux-x86_64.sh
-  ./server-linux-x86_64.sh \
+  sudo ./server-linux-x86_64.sh \
   --skip-license \
   --db-type="MySQL Server" \
   --db-driver="MySQL ODBC 8.0 Driver" \
