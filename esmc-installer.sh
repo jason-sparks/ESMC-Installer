@@ -80,48 +80,50 @@ function install_mysql()
     echo ""
     echo "MySQL Server is Installed"
     echo ""
-    fi
+    return 0
+    else     
 
-    # This repo is distribution specific xenial, bionic, focal, etc.
-    echo "deb http://repo.mysql.com/apt/ubuntu/ "$UBUNTU_CODENAME" mysql-8.0" > /etc/apt/sources.list.d/mysql.list
+      # This repo is distribution specific xenial, bionic, focal, etc.
+      echo "deb http://repo.mysql.com/apt/ubuntu/ "$UBUNTU_CODENAME" mysql-8.0" > /etc/apt/sources.list.d/mysql.list
 
-    if test -s /etc/apt/sources.list.d/mysql.list; then
-        apt update
-        debconf-set-selections <<< "mysql-community-server mysql-community-server/root-pass password eraadmin"
-        debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password eraadmin"
-        DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server unixodbc
-    fi 
+      if test -s /etc/apt/sources.list.d/mysql.list; then
+          apt update
+          debconf-set-selections <<< "mysql-community-server mysql-community-server/root-pass password eraadmin"
+          debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password eraadmin"
+          DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server unixodbc
+      fi 
 
-    STR=`mysql --version`
-    SUB="mysql  Ver 8"
-    if [[ "$STR" == *"$SUB"* ]]; then
+      STR=`mysql --version`
+      SUB="mysql  Ver 8"
+      if [[ "$STR" == *"$SUB"* ]]; then
 
-    echo "[mysqld]" >> /etc/mysql/my.cnf
-    echo "log_bin_trust_function_creators=1" >> /etc/mysql/my.cnf
-    echo "innodb_log_file_size=100M" >> /etc/mysql/my.cnf
-    echo "innodb_log_files_in_group=2" >> /etc/mysql/my.cnf
+      echo "[mysqld]" >> /etc/mysql/my.cnf
+      echo "log_bin_trust_function_creators=1" >> /etc/mysql/my.cnf
+      echo "innodb_log_file_size=100M" >> /etc/mysql/my.cnf
+      echo "innodb_log_files_in_group=2" >> /etc/mysql/my.cnf
 
-    systemctl start mysql &
-
-
-    # STR=`systemctl status mysql | grep Active:`
-    # SUB="start"
-    # if [[ "$STR" == *"$SUB"* ]]; then
-
-    # fi
+      systemctl start mysql &
 
 
-    # STR=`systemctl status mysql | grep Active:`
-    # SUB="running"
-    # if [[ "$STR" == *"$SUB"* ]]; then
+      # STR=`systemctl status mysql | grep Active:`
+      # SUB="start"
+      # if [[ "$STR" == *"$SUB"* ]]; then
 
-    # fi
+      # fi
 
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'eraadmin';"
-    echo ""
-    echo "Finished Installing MySQL Server 8"
-    echo ""
-    fi
+
+      # STR=`systemctl status mysql | grep Active:`
+      # SUB="running"
+      # if [[ "$STR" == *"$SUB"* ]]; then
+
+      # fi
+
+      mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'eraadmin';"
+      echo ""
+      echo "Finished Installing MySQL Server 8"
+      echo ""
+      fi
+  fi
 
 }
 
