@@ -74,7 +74,7 @@ function install_mysql()
     echo ""
     echo "Installing MySQL Server 8..."
     echo ""
-    mysql --version 
+    mysql --version 2>&1 > /dev/null
 
     if [[ "$?" = 0 ]]; then
     echo ""
@@ -153,7 +153,14 @@ function uninstall_mysql()
 
 function install_mysql_odbc()
 {
-    if `test -f /etc/odbcinst.ini`; then
+    STR=`cat /etc/odbcinst.ini`
+    SUB="MySQL ODBC 8.0 Driver"
+    if `test -f /etc/odbcinst.ini` && [[ "$STR" == *"$SUB"* ]]; then
+      echo ""
+      echo "MySQL ODBC Driver is Installed"
+      echo ""
+      return 0
+    else 
       echo ""
       echo "Installing MySQL ODBC Driver..."
       echo ""
@@ -165,10 +172,11 @@ function install_mysql_odbc()
         myodbc-installer -a -d -n "MySQL ODBC 8.0 Driver" -t "Driver=/usr/local/lib/libmyodbc8w.so"
       fi
       echo ""
-      echo "Done"
+      echo "MySQL ODBC Driver is Installed"
       echo ""
     fi
 }
+
 
 function uninstall_mysql_odbc()
 {
@@ -253,7 +261,7 @@ function install_tomcat()
     useradd -s /bin/false -g tomcat -d /usr/share/tomcat tomcat
     mkdir /usr/share/tomcat
     tar xzvf apache-tomcat-*tar.gz -C /usr/share/tomcat --strip-components=1
-    cd /usr/share/tomcat
+    pushd /usr/share/tomcat
     chgrp -R tomcat /usr/share/tomcat
     chown -RH tomcat /usr/share/tomcat
     chmod -R g+r conf
@@ -262,6 +270,7 @@ function install_tomcat()
     systemctl daemon-reload
     systemctl start tomcat
     systemctl enable tomcat
+    popd
     echo ""
     echo "Tomcat has been installed"
     echo ""
