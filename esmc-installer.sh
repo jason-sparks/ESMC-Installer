@@ -304,7 +304,18 @@ function uninstall_esmc_server()
   echo "Uninstalling ESMC Server..."
   echo ""
   ./server-linux-x86_64.sh \
-  --uninstall
+  --uninstall \
+  --keep-database
+}
+
+function install_webconsole()
+{
+  cp ./era.war /usr/share/tomcat/webapps/
+}
+
+function uninstall_webconsole()
+{
+  rm -Rf /usr/share/tomcat/webapps/era
 }
 
 function print_usage()
@@ -318,11 +329,12 @@ function print_usage()
     -d, --download-packages......................[optional] download ESMC components 
     -m, --install-mysql..........................[optional] install MySQL
     -M, --uninstall-mysql........................[optional] uninstall MySQL
-    -o, --install-odbc..........................[optional] install MySQL ODBC connector
-    -O, --uninstall-odbc........................[optional] uninstall MySQL ODBC connector
+    -o, --install-odbc...........................[optional] install MySQL ODBC connector
+    -O, --uninstall-odbc.........................[optional] uninstall MySQL ODBC connector
     -t, --install-tomcat.........................[optional] install tomcat
     -T, --uninstall-tomcat.......................[optional] uninstall tomcat
     -s, --install-esmc-server....................[optional] install ESMC server
+    -U, --uninstall-all everything...............[optional] uninstall all ESMC components including MySQL and Tomcat
 
     --hostname=                                  server hostname for connecting to the server (hostname, IPv4, IPv6 or service record)
     --port=                                      server port for connecting (not needed if service record was provided), default is '2222'
@@ -390,6 +402,30 @@ do
       install_esmc_server
       exit 0
       ;;
+    -S|--uninstall-esmc-server)
+      verify_root
+      uninstall_esmc_server
+      exit 0
+      ;;
+    -w|--install-webconsole)
+      verify_root
+      install_webconsole
+      exit 0
+      ;;
+    -W|--uninstall-webconsole)
+      verify_root
+      uninstall_webconsole
+      exit 0
+      ;;
+    -U|--uninstall-all)
+      verify_root
+      uninstall_webconsole
+      uninstall_esmc_server
+      uninstall_tomcat
+      uninstall_mysql_odbc
+      uninstall_mysql
+      exit 0
+      ;;
     *)
       echo "Unknown option \"$1\". Run '$script_name --help' for usage information." >&2
       exit 1
@@ -406,4 +442,5 @@ if test $# -eq 0; then
   install_java
   install_tomcat
   install_esmc_server
+  install_webconsole
 fi
