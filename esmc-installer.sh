@@ -81,8 +81,8 @@ function install_mysql()
     echo "MySQL Server is Installed"
     echo ""
     return 0
-    else     
-
+    else 
+      # Install MySQL 
       # This repo is distribution specific xenial, bionic, focal, etc.
       echo "deb http://repo.mysql.com/apt/ubuntu/ "$UBUNTU_CODENAME" mysql-8.0" > /etc/apt/sources.list.d/mysql.list
 
@@ -97,34 +97,19 @@ function install_mysql()
       SUB="mysql  Ver 8"
       if [[ "$STR" == *"$SUB"* ]]; then
 
-      echo "[mysqld]" >> /etc/mysql/my.cnf
-      echo "log_bin_trust_function_creators=1" >> /etc/mysql/my.cnf
-      echo "innodb_log_file_size=100M" >> /etc/mysql/my.cnf
-      echo "innodb_log_files_in_group=2" >> /etc/mysql/my.cnf
-
-      systemctl start mysql &
-
-
-      # STR=`systemctl status mysql | grep Active:`
-      # SUB="start"
-      # if [[ "$STR" == *"$SUB"* ]]; then
-
-      # fi
-
-
-      # STR=`systemctl status mysql | grep Active:`
-      # SUB="running"
-      # if [[ "$STR" == *"$SUB"* ]]; then
-
-      # fi
-
-      mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'eraadmin';"
-      echo ""
-      echo "Finished Installing MySQL Server 8"
-      echo ""
+        echo "[mysqld]" >> /etc/mysql/my.cnf
+        echo "log_bin_trust_function_creators=1" >> /etc/mysql/my.cnf
+        echo "innodb_log_file_size=100M" >> /etc/mysql/my.cnf
+        echo "innodb_log_files_in_group=2" >> /etc/mysql/my.cnf
+        systemctl start mysql 
+        if `test -s /var/lib/mysql/$HOSTNAME.pid`; then
+          mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'eraadmin';"
+          echo ""
+          echo "Finished Installing MySQL Server 8"
+          echo ""
+        fi
       fi
   fi
-
 }
 
 function uninstall_mysql() 
@@ -303,7 +288,7 @@ function install_esmc_server()
   --skip-license \
   --db-type="MySQL Server" \
   --db-driver="MySQL ODBC 8.0 Driver" \
-  --db-hostname=localhost \
+  --db-hostname=127.0.0.1 \
   --db-port=3306 \
   --db-admin-username=root \
   --db-admin-password=eraadmin \
