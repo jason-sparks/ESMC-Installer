@@ -98,10 +98,11 @@ function install_mysql()
       if [[ "$STR" == *"$SUB"* ]]; then
 
         echo "[mysqld]" >> /etc/mysql/my.cnf
+        echo "max_allowed_packet=33M" >> /etc/mysql/my.cnf
         echo "log_bin_trust_function_creators=1" >> /etc/mysql/my.cnf
-        echo "innodb_log_file_size=100M" >> /etc/mysql/my.cnf
+        echo "innodb_log_file_size=200M" >> /etc/mysql/my.cnf
         echo "innodb_log_files_in_group=2" >> /etc/mysql/my.cnf
-        systemctl start mysql 
+        systemctl restart mysql 
         if `test -s /var/lib/mysql/$HOSTNAME.pid`; then
           mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'eraadmin';"
           echo ""
