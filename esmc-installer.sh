@@ -115,7 +115,7 @@ function install_mysql()
 function uninstall_mysql() 
 {
     systemctl stop mysql
-    apt purge -y mysql-server
+    apt purge -y mysql-common mysql-client mysql-server
     apt -y autoremove
     rm -f /etc/apt/sources.list.d/mysql.list
     rm -Rf /var/lib/mysql
