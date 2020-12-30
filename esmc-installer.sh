@@ -45,23 +45,23 @@ function download_packages()
     echo ""
 
     if `test ! -s $(basename $ESMC_server_url)`; then
-        wget --connect-timeout 300 --no-check-certificate "$ESMC_server_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_server_url" &
+        wget --connect-timeout 300 --no-check-certificate "$ESMC_server_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_server_url"
     fi
 
     if `test ! -s $(basename $ESMC_web_console_url)`; then
-        wget --connect-timeout 300 --no-check-certificate "$ESMC_web_console_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_web_console_url" &
+        wget --connect-timeout 300 --no-check-certificate "$ESMC_web_console_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_web_console_url"
     fi
 
     if `test ! -s $(basename $ESMC_rdsensor_url)`; then
-        wget --connect-timeout 300 --no-check-certificate "$ESMC_rdsensor_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_rdsensor_url" &
+        wget --connect-timeout 300 --no-check-certificate "$ESMC_rdsensor_url" || curl -O --fail --connect-timeout 300 -k "$ESMC_rdsensor_url"
     fi
 
     if `test ! -s $(basename $tomcat_url)`; then
-        wget --connect-timeout 300 --no-check-certificate "$tomcat_url" || curl -O --fail --connect-timeout 300 -k "$tomcat_url" &
+        wget --connect-timeout 300 --no-check-certificate "$tomcat_url" || curl -O --fail --connect-timeout 300 -k "$tomcat_url"
     fi
 
     if `test ! -s $(basename $odbc_url)`; then
-        wget --connect-timeout 300 --no-check-certificate "$odbc_url" || curl -O --fail --connect-timeout 300 -k "$odbc_url" &
+        wget --connect-timeout 300 --no-check-certificate "$odbc_url" || curl -O --fail --connect-timeout 300 -k "$odbc_url"
     fi
 
     echo ""
