@@ -338,6 +338,9 @@ function print_usage()
     -t, --install-tomcat.........................[optional] install tomcat
     -T, --uninstall-tomcat.......................[optional] uninstall tomcat
     -s, --install-esmc-server....................[optional] install ESMC server
+    -S, --uninstall-esmc-server..................[optional] uninstall ESMC server
+    -w, --install-webconsole.....................[optional] install ESMC server web console
+    -W, --uninstall-webconsole...................[optional] uninstall ESMC server web console
     -U, --uninstall-all everything...............[optional] uninstall all ESMC components including MySQL and Tomcat
 
     --hostname=                                  server hostname for connecting to the server (hostname, IPv4, IPv6 or service record)
