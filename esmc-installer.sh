@@ -203,37 +203,37 @@ function install_java()
 
 function create_systemd_service_file() 
 {
-    if test -s /etc/systemd/system/multi-user.target.wants/tomcat.service; then
+    if test -s /etc/systemd/system/tomcat.service; then
         echo "Tomcat service file already exists. Is tomcat already installed?"
         return 10
     else
-        echo '[Unit]' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Description=Apache Tomcat Web Application Container' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'After=network.target' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo '' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo '[Service]' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Type=forking' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo '' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Environment="JAVA_HOME=/usr/lib/jvm/default-java"' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom"' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo '' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Environment="CATALINA_PID=/usr/share/tomcat/temp/tomcat.pid"' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Environment="CATALINA_HOME=/usr/share/tomcat"' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Environment="CATALINA_BASE=/usr/share/tomcat"' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
+        echo '[Unit]' >> /etc/systemd/system/tomcat.service
+        echo 'Description=Apache Tomcat Web Application Container' >> /etc/systemd/system/tomcat.service
+        echo 'After=network.target' >> /etc/systemd/system/tomcat.service
+        echo '' >> /etc/systemd/system/tomcat.service
+        echo '[Service]' >> /etc/systemd/system/tomcat.service
+        echo 'Type=forking' >> /etc/systemd/system/tomcat.service
+        echo '' >> /etc/systemd/system/tomcat.service
+        echo 'Environment="JAVA_HOME=/usr/lib/jvm/default-java"' >> /etc/systemd/system/tomcat.service
+        echo 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom"' >> /etc/systemd/system/tomcat.service
+        echo '' >> /etc/systemd/system/tomcat.service
+        echo 'Environment="CATALINA_PID=/usr/share/tomcat/temp/tomcat.pid"' >> /etc/systemd/system/tomcat.service
+        echo 'Environment="CATALINA_HOME=/usr/share/tomcat"' >> /etc/systemd/system/tomcat.service
+        echo 'Environment="CATALINA_BASE=/usr/share/tomcat"' >> /etc/systemd/system/tomcat.service
+        echo 'Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"' >> /etc/systemd/system/tomcat.service
         
-        echo '' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'ExecStart=/usr/share/tomcat/bin/startup.sh' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'ExecStop=/usr/share/tomcat/bin/shutdown.sh' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo '' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'User=tomcat' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Group=tomcat' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'UMask=0007' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'RestartSec=10' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'Restart=always' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo '' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo '[Install]' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'WantedBy=multi-user.target' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
+        echo '' >> /etc/systemd/system/tomcat.service
+        echo 'ExecStart=/usr/share/tomcat/bin/startup.sh' >> /etc/systemd/system/tomcat.service
+        echo 'ExecStop=/usr/share/tomcat/bin/shutdown.sh' >> /etc/systemd/system/tomcat.service
+        echo '' >> /etc/systemd/system/tomcat.service
+        echo 'User=tomcat' >> /etc/systemd/system/tomcat.service
+        echo 'Group=tomcat' >> /etc/systemd/system/tomcat.service
+        echo 'UMask=0007' >> /etc/systemd/system/tomcat.service
+        echo 'RestartSec=10' >> /etc/systemd/system/tomcat.service
+        echo 'Restart=always' >> /etc/systemd/system/tomcat.service
+        echo '' >> /etc/systemd/system/tomcat.service
+        echo '[Install]' >> /etc/systemd/system/tomcat.service
+        echo 'WantedBy=multi-user.target' >> /etc/systemd/system/tomcat.service
 
         return 0;
     fi
@@ -265,7 +265,7 @@ function uninstall_tomcat()
 {
     systemctl stop tomcat 
     rm -Rf /usr/share/tomcat/
-    rm -f /etc/systemd/system/multi-user.target.wants/tomcat.service
+    rm -f /etc/systemd/system/tomcat.service
     systemctl daemon-reload
     userdel tomcat
     echo ""
@@ -439,7 +439,6 @@ if test $# -eq 0; then
   download_packages  
   install_mysql
   install_mysql_odbc
-  install_java
   install_tomcat
   install_esmc_server
   install_webconsole
