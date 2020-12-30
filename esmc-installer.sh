@@ -90,7 +90,7 @@ function install_mysql()
           apt update
           debconf-set-selections <<< "mysql-community-server mysql-community-server/root-pass password eraadmin"
           debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password eraadmin"
-          DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server unixodbc
+          DEBIAN_FRONTEND=noninteractive apt-get -y install unixodbc mysql-common mysql-client mysql-server
       fi 
 
       STR=`mysql --version`
@@ -115,14 +115,15 @@ function install_mysql()
 function uninstall_mysql() 
 {
     systemctl stop mysql
-    apt-get purge -y mysql-server
-    apt-get -y autoremove
+    apt purge -y mysql-server
+    apt -y autoremove
     rm -f /etc/apt/sources.list.d/mysql.list
     rm -Rf /var/lib/mysql
     rm -Rf /var/log/mysql
     rm -Rf /etc/mysql
     rm /etc/systemd/system/multi-user.target.wants/mysql.service
     rm /etc/systemd/system/mysql.service
+    rm -Rf /var/lib/mysql*
     apt autoremove
     apt autoclean
     # Any mysql packages installed? 
@@ -151,10 +152,11 @@ function install_mysql_odbc()
       echo ""
       if `test -s $(basename $odbc_url)`; then
         tar xzvf $(basename $odbc_url)
-        cd $(basename ${odbc_url%.*.*}) 
+        pushd $(basename ${odbc_url%.*.*}) 
         cp ./bin/* /usr/local/bin/
         cp ./lib/* /usr/local/lib/
         myodbc-installer -a -d -n "MySQL ODBC 8.0 Driver" -t "Driver=/usr/local/lib/libmyodbc8w.so"
+        popd
       fi
       echo ""
       echo "MySQL ODBC Driver is Installed"
@@ -245,16 +247,18 @@ function install_tomcat()
     groupadd tomcat
     useradd -s /bin/false -g tomcat -d /usr/share/tomcat tomcat
     mkdir /usr/share/tomcat
-    tar xzvf apache-tomcat-*tar.gz -C /usr/share/tomcat --strip-components=1
-    pushd /usr/share/tomcat
-    chgrp -R tomcat /usr/share/tomcat
-    chown -RH tomcat /usr/share/tomcat
-    chmod -R g+r conf
-    chmod g+x conf
-    create_systemd_service_file
-    systemctl daemon-reload
-    systemctl start tomcat
-    systemctl enable tomcat
+    if `test -d /usr/share/tomcat`; then 
+      tar xzvf apache-tomcat-*tar.gz -C /usr/share/tomcat --strip-components=1
+      chgrp -R tomcat /usr/share/tomcat
+      chown -RH tomcat /usr/share/tomcat
+      pushd /usr/share/tomcat 2>&1 > /dev/null
+      chmod -R g+r conf
+      chmod g+x conf
+      create_systemd_service_file
+      systemctl daemon-reload
+      systemctl start tomcat
+      systemctl enable tomcat
+    fi
     popd
     echo ""
     echo "Tomcat has been installed"
