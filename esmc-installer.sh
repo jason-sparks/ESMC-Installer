@@ -233,7 +233,7 @@ function create_systemd_service_file()
         echo 'Restart=always' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
         echo '' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
         echo '[Install]' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
-        echo 'WantedBy=multi-user.target' >> /etc/systemd/system/mqulti-user.target.wants/tomcat.service
+        echo 'WantedBy=multi-user.target' >> /etc/systemd/system/multi-user.target.wants/tomcat.service
 
         return 0;
     fi
