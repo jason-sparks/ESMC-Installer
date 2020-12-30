@@ -9,7 +9,7 @@ script_name=`basename $0`
 script_version="1.0"
 source /etc/os-release
 
-tomcat_url="https://apache.osuosl.org/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-9.0.41.tar.gz"
+tomcat_url="https://apache.osuosl.org/tomcat/tomcat-9/v9.0.41/bin/apache-tomcat-9.0.41.tar.gz"
 ESMC_server_url="https://download.eset.com/com/eset/apps/business/era/server/linux/latest/server-linux-x86_64.sh"
 ESMC_web_console_url="https://download.eset.com/com/eset/apps/business/era/webconsole/latest/era.war"
 ESMC_rdsensor_url="https://download.eset.com/com/eset/apps/business/era/rdsensor/latest/rdsensor-linux-x86_64.sh"
