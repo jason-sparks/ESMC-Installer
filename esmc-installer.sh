@@ -326,6 +326,7 @@ function uninstall_webconsole()
 function print_usage()
 {
     cat <<EOF
+    ESMC-Installer version 1.0
     Usage: $(basename $0) [options]
 
     Options:
